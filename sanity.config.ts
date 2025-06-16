@@ -1,42 +1,28 @@
-import { visionTool } from "@sanity/vision";
-import { defineConfig } from "sanity";
-import { deskTool } from "sanity/desk";
-import Logo from "./components/Logo";
-import StudioNavbar from "./components/StudioNavbar";
+'use client'
 
-import { schemaTypes } from "./schemas";
-import { getDefaultDocumentNode } from "./structure";
-import { myTheme } from "./theme";
+/**
+ * This configuration is used to for the Sanity Studio that’s mounted on the `/app/studio/[[...tool]]/page.tsx` route
+ */
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!;
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET!;
+import {visionTool} from '@sanity/vision'
+import {defineConfig} from 'sanity'
+import {structureTool} from 'sanity/structure'
+
+// Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
+import {apiVersion, dataset, projectId} from './sanity/env'
+import {schema} from './sanity/schemaTypes'
+import {structure} from './sanity/structure'
 
 export default defineConfig({
-  basePath: "/studio", // <-- important that `basePath` matches the route you're mounting your studio from, it applies to both `/pages` and `/app`
-
+  basePath: '/studio',
   projectId,
   dataset,
-
+  // Add and edit the content schema in the './sanity/schemaTypes' folder
+  schema,
   plugins: [
-    deskTool({
-      defaultDocumentNode: getDefaultDocumentNode,
-    }),
-    visionTool(),
+    structureTool({structure}),
+    // Vision is for querying with GROQ from inside the Studio
+    // https://www.sanity.io/docs/the-vision-plugin
+    visionTool({defaultApiVersion: apiVersion}),
   ],
-
-  schema: {
-    types: schemaTypes,
-  },
-  icon: Logo,
-  logo: Logo,
-  subtitle: "Login to manage the Blog",
-  title: "PAPAFAM Content Studio",
-  name: "PAPAFAM_Content_Studio",
-  studio: {
-    components: {
-      logo: Logo,
-      navbar: StudioNavbar,
-    },
-  },
-  theme: myTheme,
-});
+})
